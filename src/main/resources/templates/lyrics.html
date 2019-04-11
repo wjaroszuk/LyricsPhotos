@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="layout">
+<head>
+    <title>LyricsPhotos | Lyrics w/ tags</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 th:text="${songWithTags.artist + ' - ' + songWithTags.title}"></h1>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Line</th>
+                <th>Tag(s)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="lineWithTag : ${songWithTags.linesWithTags}">
+                <td th:text="${lineWithTag.line}">line</td>
+                <td th:text="${lineWithTag.tag}">tag</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="layout">
+<head>
+    <title>CraftLab | Songs</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1>List of songs</h1>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Artist</th>
+                <th>Title</th>
+                <th># of lines</th>
+                <th>Lyrics</th>
+                <th>GENERATE</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="song : ${songs}">
+                <td th:text="${song.id}">id</td>
+                <td th:text="${song.artist}">artist</td>
+                <td th:text="${song.title}">title</td>
+                <td th:text="${song.lyrics.size()}">lines</td>
+                <td><a th:href="@{/songs/lyrics/{id}(id=${song.id})}">OPEN</a></td>
+                <td><a th:href="@{/songs/lyricsWithImages/{id}(id=${song.id})}">GENERATE</a></td>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

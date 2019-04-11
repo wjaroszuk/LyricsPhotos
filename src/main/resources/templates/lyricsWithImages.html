@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="layout">
+<head>
+    <title>CraftLab | Songs</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 th:text="${song.artist + ' - ' + song.title}"></h1>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Line</th>
+                <th>Image</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="line : ${song.lyrics}">
+                <td th:text="${line}">line</td>
+                <td><img th:src="@{../../../../generated_photos/image_0.jpg}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
