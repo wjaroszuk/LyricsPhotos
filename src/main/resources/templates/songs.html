@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
       layout:decorator="layout">
 <head>
-    <title>CraftLab | Songs</title>
+    <title>LyricsPhotos | Songs</title>
 </head>
 <body>
 <div layout:fragment="content">
@@ -16,9 +16,11 @@
                 <th>ID</th>
                 <th>Artist</th>
                 <th>Title</th>
-                <th># of lines</th>
-                <th>Lyrics</th>
-                <th>GENERATE</th>
+                <th># of stanzas</th>
+                <th>Show lyrics</th>
+                <th>Show images</th>
+                <th>GENERATE TAGS</th>
+                <th>GENERATE IMAGES</th>
             </tr>
             </thead>
             <tbody>
@@ -26,9 +28,11 @@
                 <td th:text="${song.id}">id</td>
                 <td th:text="${song.artist}">artist</td>
                 <td th:text="${song.title}">title</td>
-                <td th:text="${song.lyrics.size()}">lines</td>
-                <td><a th:href="@{/songs/lyrics/{id}(id=${song.id})}">OPEN</a></td>
-                <td><a th:href="@{/songs/lyricsWithImages/{id}(id=${song.id})}">GENERATE</a></td>
+                <td th:text="${song.stanzas.size()}">stanzas</td> <!-- works -->
+                <td><a th:href="@{/songs/lyrics/{id}(id=${song.id})}">SHOW LYRICS</a></td> <!-- aka OPEN -->
+                <td><a th:href="@{/songs/lyricsWithImages/{id}(id=${song.id})}">SHOW IMAGES</a></td> <!-- aka GENERATE-->
+                <td><a th:href="@{/songs/generateTags/{id}(id=${song.id})}">GENERATE TAGS</a></td>
+                <td><a th:href="@{/songs/generateImages/{id}(id=${song.id})}">GENERATE IMAGES</a></td>
                 </td>
             </tr>
             </tbody>

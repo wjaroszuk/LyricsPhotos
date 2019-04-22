@@ -1,8 +1,7 @@
 package com.lyricsphotos.controller;
 
-import com.lyricsphotos.data.LineWithTag;
 import com.lyricsphotos.data.Song;
-import com.lyricsphotos.data.SongWithTags;
+import com.lyricsphotos.service.FlickrService;
 import com.lyricsphotos.service.NounsService;
 import com.lyricsphotos.service.SongsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.sound.sampled.Line;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 @Controller
 public class SongsController {
@@ -22,6 +18,9 @@ public class SongsController {
 
     @Autowired
     private NounsService nounsService;
+
+    @Autowired
+    private FlickrService flickrService;
 
     @GetMapping(value = "/songs")
     public String getAllSongs(Model model) {
@@ -32,22 +31,39 @@ public class SongsController {
     @GetMapping(value = "/songs/lyrics/{id}")
     public String getSongDetails(@PathVariable(value = "id") int id, Model model) throws IOException {
         Song song = songsService.findSongById(id);
-        ArrayList<String> tags = nounsService.extractNouns(song.getLyrics());
-        ArrayList<String> lyrics = song.getLyrics();
-        ArrayList<LineWithTag> linesWithTags = new ArrayList<>();
-        for(int i = 0; i < tags.size(); i++) {
-            LineWithTag lineWithTag = new LineWithTag(lyrics.get(i), tags.get(i));
-            linesWithTags.add(lineWithTag);
+        if (!song.isAreTagsGenerated()) { // generate if tags are not generated
+            System.out.println(" getSongDetails >>> TAGS: " + song.isAreTagsGenerated() + "IMAGES: " + song.isAreImagesGenerated());
+            song = nounsService.extractNounsAndSetTags(song);
+            song.setAreTagsGenerated(true);
+            System.out.println(" getSongDetails >>> TAGS: " + song.isAreTagsGenerated() + "IMAGES: " + song.isAreImagesGenerated());
         }
-
-        SongWithTags songWithTags = new SongWithTags(song, linesWithTags);
-        model.addAttribute("songWithTags", songWithTags);
+        songsService.updateSong(song);
+        model.addAttribute("song", songsService.findSongById(id));
+//        model.addAttribute("song", song);
         return "/lyrics";
     }
 
-    @GetMapping(value="/songs/lyricsWithImages/{id}")
-    public String getSongDetailsWithImages(@PathVariable(value = "id") int id, Model model) {
+    @GetMapping(value = "/songs/lyricsWithImages/{id}")
+    public String getSongDetailsWithImages(@PathVariable(value = "id") int id, Model model) throws IOException {
+        Song song = songsService.findSongById(id);
+        if (!song.isAreTagsGenerated()) { // if tags are not generated, then generate tags+images
+            System.out.println(" getSongDetailsWithImages #1 >>> TAGS: " + song.isAreTagsGenerated() + "IMAGES: " + song.isAreImagesGenerated());
+            song = nounsService.extractNounsAndSetTags(song);
+            song.setAreTagsGenerated(true);
+            System.out.println(" getSongDetailsWithImages #1 >>> TAGS: " + song.isAreTagsGenerated() + "IMAGES: " + song.isAreImagesGenerated());
+            flickrService.searchAndSave(song);
+            song.setAreImagesGenerated(true);
+            System.out.println(" getSongDetailsWithImages #1 >>> TAGS: " + song.isAreTagsGenerated() + "IMAGES: " + song.isAreImagesGenerated());
+        }
+        if (!song.isAreImagesGenerated()) { // if images are not generated (but tags are generated), then generate images
+            System.out.println(" getSongDetailsWithImages #2 >>> TAGS: " + song.isAreTagsGenerated() + "IMAGES: " + song.isAreImagesGenerated());
+            flickrService.searchAndSave(song);
+            song.setAreImagesGenerated(true);
+            System.out.println(" getSongDetailsWithImages #2 >>> TAGS: " + song.isAreTagsGenerated() + "IMAGES: " + song.isAreImagesGenerated());
+        }
+        songsService.updateSong(song);
         model.addAttribute("song", songsService.findSongById(id));
+//        model.addAttribute("song", song);
         return "/lyricsWithImages";
     }
 }

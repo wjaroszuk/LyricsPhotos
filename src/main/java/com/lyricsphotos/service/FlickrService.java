@@ -9,15 +9,18 @@ import com.flickr4java.flickr.auth.Permission;
 import com.flickr4java.flickr.people.User;
 import com.flickr4java.flickr.photos.*;
 import com.github.scribejava.core.model.OAuth1RequestToken;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.lyricsphotos.data.Song;
+import com.lyricsphotos.data.Stanza;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,38 +44,29 @@ public class FlickrService {
         flickr.setAuth(auth);
     }
 
-    public void testFlickr() {
-        try {
-            PhotosInterface photosInterface = flickr.getPhotosInterface();
-            Photo photo = photosInterface.getPhoto("6940286716");
-            File outputFile = new File(mainDirectory + "test_photo");
-            ImageIO.write(photosInterface.getImage(photo, Size.MEDIUM_800), "jpg", outputFile);
-        } catch (FlickrException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    //    public List<Photo> search(String[] tags, Integer page, Integer perPage) {
-    public void search(String[] tags, Integer page, Integer perPage) {
+    public void searchAndSave(Song song) throws IOException {
         PhotosInterface photosInterface = flickr.getPhotosInterface();
         SearchParameters params = new SearchParameters();
-        params.setTags(tags);
-        Set<String> extras = new HashSet<>(Extras.ALL_EXTRAS);
-        extras.remove(Extras.MACHINE_TAGS);
-        params.setExtras(extras);
-        params.setSort(SearchParameters.INTERESTINGNESS_DESC);
-        params.setSafeSearch("on"); // not sure if works
+        String path = mainDirectory + "\\" + song.getArtist() + "-" + song.getTitle();
+        Files.createDirectories(Paths.get(path));
+        ArrayList<Stanza> stanzas = song.getStanzas();
+        for (int i = 0; i < song.getStanzas().size(); i++) {
+            params.setTags(stanzas.get(i).getTags().stream().toArray(String[]::new));
+            Set<String> extras = new HashSet<>(Extras.ALL_EXTRAS);
+            extras.remove(Extras.MACHINE_TAGS);
+            params.setExtras(extras);
+            params.setSort(SearchParameters.INTERESTINGNESS_DESC);
+            params.setSafeSearch("on"); // not sure if works
 
-        try {
-            long start = System.currentTimeMillis();
-            PhotoList<Photo> searchResult = photosInterface.search(params, perPage, page);
-            System.out.println("Reading "+ perPage +" photos over interface took {" + (System.currentTimeMillis() - start) + "} ms");
-            for (int i = 0; i < searchResult.size(); i++) {
-                File outputFile = new File(mainDirectory + "image_" + i + ".jpg");
-                ImageIO.write(photosInterface.getImage(searchResult.get(i), Size.MEDIUM_800), "jpg", outputFile);
+            try {
+                long start = System.currentTimeMillis();
+                PhotoList<Photo> searchResult = photosInterface.search(params, 1, 1);
+                System.out.println("Reading a photo over interface took {" + (System.currentTimeMillis() - start) + "} ms");
+                File file = new File(path + "/" + "image" + i + ".jpg");
+                ImageIO.write(photosInterface.getImage(searchResult.get(0), Size.MEDIUM_640), "jpg", file);
+            } catch (FlickrException | IOException e) {
+                e.printStackTrace();
             }
-        } catch (FlickrException | IOException e) {
-            e.printStackTrace();
         }
     }
 }

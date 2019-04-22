@@ -15,15 +15,20 @@ public class Song implements Serializable {
     private String artist;
     private String title;
     @Lob
-    private ArrayList<String> lyrics;
+    private ArrayList<Stanza> stanzas;
+    private boolean areImagesGenerated = false;
+    private boolean areTagsGenerated = false;
+
 
     public Song() {
     }
 
-    public Song(String artist, String title, ArrayList<String> lyrics) {
+    public Song(String artist, String title, ArrayList<Stanza> stanzas, boolean areImagesGenerated, boolean areTagsGenerated) {
         this.artist = artist;
         this.title = title;
-        this.lyrics = lyrics;
+        this.stanzas = stanzas;
+        this.areImagesGenerated = areImagesGenerated;
+        this.areTagsGenerated = areTagsGenerated;
     }
 
     public int getId() {
@@ -50,11 +55,29 @@ public class Song implements Serializable {
         this.title = title;
     }
 
-    public ArrayList<String> getLyrics() {
-        return lyrics;
+    public ArrayList<Stanza> getStanzas() {
+        return stanzas;
     }
 
-    public void setLyrics(ArrayList<String> lyrics) {
-        this.lyrics = lyrics;
+    public void setStanzas(ArrayList<Stanza> stanzas) {
+        this.stanzas = stanzas;
     }
+
+    public boolean isAreImagesGenerated() {
+        return areImagesGenerated;
+    }
+
+    public void setAreImagesGenerated(boolean areImagesGenerated) {
+        this.areImagesGenerated = areImagesGenerated;
+    }
+
+    public boolean isAreTagsGenerated() {
+        return areTagsGenerated;
+    }
+
+    public void setAreTagsGenerated(boolean areTagsGenerated) {
+        this.areTagsGenerated = areTagsGenerated;
+    }
+
+
 }

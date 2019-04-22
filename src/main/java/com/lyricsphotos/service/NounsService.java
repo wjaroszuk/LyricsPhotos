@@ -1,66 +1,90 @@
 package com.lyricsphotos.service;
 
+import com.lyricsphotos.data.Song;
+import com.lyricsphotos.data.Stanza;
+import com.lyricsphotos.service.weka.ClassifierService;
 import opennlp.tools.postag.POSModel;
 import opennlp.tools.postag.POSSample;
 import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class NounsService {
-    public ArrayList<String> extractNouns(ArrayList<String> lyrics) throws IOException {
-        ArrayList<String> tags = new ArrayList<>();
-        for (String line : lyrics) {
-            POSSample lineSample = generatePOSSample(line);
-            int lineSampleLength = lineSample.getSentence().length;
+    @Autowired
+    ClassifierService classifierService;
+    
+    private static final String WORD_REGEX = "[^A-Za-z]";
 
-            ArrayList<String> nounList = new ArrayList<>();
+    public Song extractNounsAndSetTags(Song song) throws IOException {
+        for (Stanza stanza : song.getStanzas()) {
+            POSSample stanzaSampled = generatePOSSample(stanza);
+            int lineSampleLength = stanzaSampled.getSentence().length;
+
+            List<String> nounList = new ArrayList<>();
             for (int i = 0; i < lineSampleLength; i++) { // select only nouns from the line
-                if (lineSample.getTags()[i].startsWith("N")) {
-                    nounList.add(lineSample.getSentence()[i]);
+                if (stanzaSampled.getTags()[i].startsWith("N")) {
+                    nounList.add(stanzaSampled.getSentence()[i]);
                 }
             }
 
+            nounList = nounList.stream().distinct().collect(Collectors.toList()); // remove occurrences like "You'll" - output is "You"
+            ArrayList<String> tags = new ArrayList<>();
+
             if (nounList.isEmpty()) { // if there are no nouns, return the longest word and go to next line
-                tags.add(getLongestWord(lineSample.getSentence()));
-            } else if (nounList.size() == 1) { // if there is one noun, return it
-                tags.add(nounList.get(0));
-            } else { // if there are multiple nouns, return the longest one
-                Object[] objectArray = nounList.toArray();
-                String[] nounArray = Arrays.copyOf(objectArray, objectArray.length, String[].class);
-                tags.add(getLongestWord(nounArray));
+                String longestWord = "";
+                for (int i = 0; i < lineSampleLength; i++) {
+                    String currentWord = stanzaSampled.getSentence()[i];
+                    if (currentWord.length() >= longestWord.length()) {
+                        longestWord = currentWord;
+                    }
+                }
+                tags.add(longestWord.split(WORD_REGEX)[0]);
+                stanza.setTags(tags);
+            } else if (nounList.size() <= 3) { // if there are 1-3 nouns, return them all
+                nounList.forEach(word -> word = word.split(WORD_REGEX)[0]);
+                tags.addAll(nounList);
+                stanza.setTags(tags);
+            } else { // if there are 4+ nouns, return three longest nouns
+                String tag1 = Collections.max(nounList, Comparator.comparing(String::length));
+                nounList.remove(tag1);
+                String tag2 = Collections.max(nounList, Comparator.comparing(String::length));
+                nounList.remove(tag2);
+                String tag3 = Collections.max(nounList, Comparator.comparing(String::length));
+                nounList.remove(tag3);
+                tags.add(tag1.split(WORD_REGEX)[0]);
+                tags.add(tag2.split(WORD_REGEX)[0]);
+                tags.add(tag3.split(WORD_REGEX)[0]);
+                stanza.setTags(tags);
             }
         }
-        return tags;
+        // TODO add weather tag
+//        classifierService
+        // TODO end of add weather tag
+        return song;
     }
 
-    private POSSample generatePOSSample(String line) throws IOException {
+    private POSSample generatePOSSample(Stanza stanza) throws IOException {
         InputStream inputStream = new FileInputStream("D:\\Projects\\LyricsPhotos\\en-pos-maxent.bin");
         POSModel model = new POSModel(inputStream);
         POSTaggerME tagger = new POSTaggerME(model);
         WhitespaceTokenizer whitespaceTokenizer = WhitespaceTokenizer.INSTANCE;
-        String[] tokens = whitespaceTokenizer.tokenize(line);
-        String[] tags = tagger.tag(tokens);
-        POSSample sample = new POSSample(tokens, tags);
-        return sample;
-    }
-
-    // Get longest word in the array (the last one, taking order into account)
-    private String getLongestWord(String[] stringArray) {
-        int index = 0;
-        int elementLength = stringArray[0].length();
-        for (int i = 1; i < stringArray.length; i++) {
-            if (stringArray[i].length() >= elementLength) {
-                index = i;
-                elementLength = stringArray[i].length();
-            }
+        StringBuilder lineText = new StringBuilder();
+        for (String line : stanza.getLines()) {
+            lineText.append(line).append(" ");
         }
-        return stringArray[index];
+        String[] tokens = whitespaceTokenizer.tokenize(String.valueOf(lineText));
+        String[] tags = tagger.tag(tokens);
+        return new POSSample(tokens, tags);
     }
 }

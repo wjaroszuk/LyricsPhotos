@@ -1,6 +1,7 @@
 package com.lyricsphotos;
 
 import com.lyricsphotos.data.Song;
+import com.lyricsphotos.data.Stanza;
 import com.lyricsphotos.repository.SongsRepository;
 import com.lyricsphotos.service.FlickrService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,23 +52,30 @@ public class LyricsPhotosApplication {
 
         for (File file : files) {
             System.out.println("Reading file: " + file.getPath());
+            List<String> lyricsLines;
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                String initLine;
-                ArrayList<String> lyricsLines = new ArrayList<>();
-                while ((initLine = br.readLine()) != null) {
-                    if (!initLine.isEmpty()) {
-                        lyricsLines.add(initLine);
+                lyricsLines = br.lines().collect(Collectors.toList());
+            }
+            ArrayList<Stanza> stanzas = new ArrayList<>();
+            ArrayList<String> currentLines = new ArrayList<>();
+            Stanza stanza = new Stanza();
+
+            for (String currentLine : lyricsLines) {
+                if (currentLine != null) {
+                    if (currentLine.length() == 0) {
+                        stanza.setLines(currentLines);
+                        stanzas.add(stanza);
+                        stanza = new Stanza();
+                        currentLines = new ArrayList<>();
+                    } else {
+                        currentLines.add(currentLine);
                     }
                 }
-                String[] fileNameSplit = file.getName().substring(0, file.getName().lastIndexOf(".")).split("-");
-                Song song = new Song(fileNameSplit[0], fileNameSplit[1], lyricsLines);
-                songsRepository.save(song);
             }
+            String[] fileNameSplit = file.getName().substring(0, file.getName().lastIndexOf(".")).split("-");
+            Song song = new Song(fileNameSplit[0], fileNameSplit[1], stanzas, false, false);
+            songsRepository.save(song);
         }
-//        flickrService.testFlickr();
-        // Sunny, Cloudy, Rain, Snow lub Rainbow -- to append!
-        String[] tags = {"creep", "Rain"};
-        flickrService.search(tags, 1, 1);
     }
 
     @Bean
