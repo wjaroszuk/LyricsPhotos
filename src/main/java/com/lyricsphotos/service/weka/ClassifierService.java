@@ -110,6 +110,7 @@ public class ClassifierService {
             try {
                 this.trainingSet.addAll(new Instances(br));
             } catch (IOException e) {
+                System.out.println("Problem with file: " + file.getName());
                 e.printStackTrace();
             }
             br.close();

@@ -19,8 +19,10 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,7 +50,12 @@ public class FlickrService {
         PhotosInterface photosInterface = flickr.getPhotosInterface();
         SearchParameters params = new SearchParameters();
         String path = mainDirectory + "\\" + song.getArtist() + "-" + song.getTitle();
-        Files.deleteIfExists(Paths.get(path));
+        if (Files.exists(Paths.get(path))) {
+            Files.walk(Paths.get(path))
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+        }
         Files.createDirectories(Paths.get(path));
         ArrayList<Stanza> stanzas = song.getStanzas();
         for (int i = 0; i < song.getStanzas().size(); i++) {

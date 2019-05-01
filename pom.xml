@@ -10,7 +10,7 @@
     </parent>
     <groupId>com</groupId>
     <artifactId>lyricsphotos</artifactId>
-    <version>0.2</version>
+    <version>1.0</version>
     <packaging>war</packaging>
     <name>LyricsPhotos</name>
     <description>University project that assigns photo to all stanzas of the song using Weka, Spring Boot and Thymeleaf.</description>
@@ -69,7 +69,7 @@
         <dependency>
             <groupId>nz.ac.waikato.cms.weka</groupId>
             <artifactId>weka-stable</artifactId>
-            <version>3.8.0</version>
+            <version>3.8.3</version>
         </dependency>
         <dependency>
             <groupId>nz.net.ultraq.thymeleaf</groupId>
