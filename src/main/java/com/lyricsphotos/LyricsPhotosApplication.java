@@ -3,7 +3,6 @@ package com.lyricsphotos;
 import com.lyricsphotos.data.Song;
 import com.lyricsphotos.data.Stanza;
 import com.lyricsphotos.repository.SongsRepository;
-import com.lyricsphotos.service.FlickrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.Banner;
@@ -32,9 +31,6 @@ public class LyricsPhotosApplication {
     SongsRepository songsRepository;
 
     @Autowired
-    FlickrService flickrService;
-
-    @Autowired
     private ThymeleafProperties thymeleafProperties;
 
     @Value("${spring.thymeleaf.templates-root}")
@@ -48,10 +44,14 @@ public class LyricsPhotosApplication {
 
     @PostConstruct
     void init() throws IOException {
-        List<File> files = Files.walk(Paths.get("D:\\lyrics")).filter(Files::isRegularFile).map(Path::toFile).collect(Collectors.toList());
+        readAllTestData();
+    }
+
+    private void readAllTestData() throws IOException {
+        List<File> files = Files.walk(Paths.get("D:\\lyrics\\testset")).filter(Files::isRegularFile).map(Path::toFile).collect(Collectors.toList());
 
         for (File file : files) {
-            System.out.println("Reading file: " + file.getPath());
+//            System.out.println("Reading file: " + file.getPath());
             List<String> lyricsLines;
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 lyricsLines = br.lines().collect(Collectors.toList());

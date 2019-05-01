@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 <head>
+    <link th:href="@{/static/images/favicon/favicon.ico}" rel="icon" sizes="152" type="image/x-icon"/>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/css/all.min.css}" rel="stylesheet"/>
+    <title>layout</title>
 </head>
 <body>
-<div id="wrapper">
-    <div id="page-wrapper">
-        <div class="row">
-            <div layout:fragment="content" class="content-fragment">
-                <!-- CONTENT GOES HERE -->
-            </div>
-        </div>
+<div th:replace="navbar :: navbar">
+    <!-- NAVBAR GOES HERE -->
+</div>
+<div class="container-fluid">
+    <div layout:fragment="content">
+        <!-- CONTENT GOES HERE -->
     </div>
 </div>
 </body>

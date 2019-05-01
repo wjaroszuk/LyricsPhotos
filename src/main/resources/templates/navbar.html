@@ -1,0 +1,13 @@
+<header th:fragment="navbar" xmlns:th="http://www.thymeleaf.org">
+    <nav class="navbar navbar-dark bg-dark sticky-top navbar-expand">
+        <a class="navbar-brand" th:href="@{/songs}">
+            <img th:src="@{/images/pencil-brush.png}" th:width="32px" th:height="32px" class="img-responsive" alt="">
+            LyricsPhotos
+        </a>
+        <div class="navbar-nav ">
+            <a class="nav-item nav-link" th:href="@{/songs}">Songs</a>
+            <a class="nav-item nav-link" th:href="@{/classifierDetails}">Classifier details</a>
+            <a class="nav-item nav-link" th:href="@{/rebuildClassifier}">Rebuild classifier</a>
+        </div>
+    </nav>
+</header>

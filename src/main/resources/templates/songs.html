@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorator="layout">
+      layout:decorate="~{layout}">
 <head>
     <title>LyricsPhotos | Songs</title>
 </head>
 <body>
 <div layout:fragment="content">
     <h1>List of songs</h1>
-
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
@@ -19,8 +18,8 @@
                 <th># of stanzas</th>
                 <th>Show lyrics</th>
                 <th>Show images</th>
-                <th>GENERATE TAGS</th>
-                <th>GENERATE IMAGES</th>
+                <th>Generate tags</th>
+                <th>Generate images</th>
             </tr>
             </thead>
             <tbody>
@@ -28,11 +27,33 @@
                 <td th:text="${song.id}">id</td>
                 <td th:text="${song.artist}">artist</td>
                 <td th:text="${song.title}">title</td>
-                <td th:text="${song.stanzas.size()}">stanzas</td> <!-- works -->
-                <td><a th:href="@{/songs/lyrics/{id}(id=${song.id})}">SHOW LYRICS</a></td> <!-- aka OPEN -->
-                <td><a th:href="@{/songs/lyricsWithImages/{id}(id=${song.id})}">SHOW IMAGES</a></td> <!-- aka GENERATE-->
-                <td><a th:href="@{/songs/generateTags/{id}(id=${song.id})}">GENERATE TAGS</a></td>
-                <td><a th:href="@{/songs/generateImages/{id}(id=${song.id})}">GENERATE IMAGES</a></td>
+                <td th:text="${song.stanzas.size()}">stanzas</td>
+                <div th:if="${!song.areTagsGenerated}">
+                    <td><a class="text-danger" th:href="@{/songs/lyrics/{id}(id=${song.id})}">
+                        <span class="far fa-file-word fa-2x"></span>
+                    </a></td>
+                </div>
+                <div th:if="${song.areTagsGenerated}">
+                    <td><a class="text-success" th:href="@{/songs/lyrics/{id}(id=${song.id})}">
+                        <span class="far fa-file-word fa-2x"></span>
+                    </a></td>
+                </div>
+                <div th:if="${!song.areImagesGenerated}">
+                    <td><a class="text-danger" th:href="@{/songs/lyricsWithImages/{id}(id=${song.id})}">
+                        <span class="far fa-images fa-2x"></span>
+                    </a></td>
+                </div>
+                <div th:if="${song.areImagesGenerated}">
+                    <td><a class="text-success" th:href="@{/songs/lyricsWithImages/{id}(id=${song.id})}">
+                        <span class="far fa-images fa-2x"></span>
+                    </a></td>
+                </div>
+                <td><a class="text-dark" th:href="@{/songs/forceGenerateTags/{id}(id=${song.id})}">
+                    <span class="fas fa-tags fa-2x"></span>
+                </a></td> <!-- fa-hashtag -->
+                <td><a class="text-dark" th:href="@{/songs/forceGenerateImages/{id}(id=${song.id})}">
+                    <span class="fas fa-camera-retro fa-2x"></span>
+                </a></td>
                 </td>
             </tr>
             </tbody>

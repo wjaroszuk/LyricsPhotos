@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>LyricsPhotos | Rebuild classifier</title>
+    <script type="text/javascript">
+        function writeChecked() {
+            var items = document.getElementsByName('trainingFilename');
+            var selectedItems = [];
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].checked === true)
+                    selectedItems.push(items[i].value);
+            }
+            document.getElementById('trainingSet').setAttribute("value", selectedItems.toString().replace(/,/g, ";"));
+        }
+    </script>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1>Rebuild classifier</h1>
+    <h3>Select which instances are used to rebuild classifier:</h3>
+
+    <form method="post" action="/rebuildClassifier">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>*</th>
+                <th>Training set</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="trainingFilename : ${trainingFilenames}">
+                <td><input type="checkbox" name="trainingFilename" th:value="${trainingFilename}" checked></td>
+                <td th:text="${trainingFilename}">trainingFilename</td>
+            </tr>
+            </tbody>
+        </table>
+        <input type="button" onclick="writeChecked()" value="Propagate from list">
+        <h3>Select classifier:</h3>
+        <fieldset>
+            <input type="radio" name="classifierName" value="J48" required>J48<br>
+            <input type="radio" name="classifierName" value="IBk" required>IBk<br>
+            <br/>
+            <label>Training set</label>
+            <input type="text" id="trainingSet" name="trainingSet" size="140" required readonly>
+            <br/>
+            <input type="submit" value="Rebuild!">
+        </fieldset>
+    </form>
+</div>
+</body>
+</html>

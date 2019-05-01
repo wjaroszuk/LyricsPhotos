@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>LyricsPhotos | Classifier details</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1>Classifier details</h1>
+    <div th:if="${#strings.containsIgnoreCase(classifier, 'J48')}">
+        <div th:text="${'Classifier: ' + classifier.graph()}"></div>
+    </div>
+
+    <div th:if="${#strings.containsIgnoreCase(classifier, 'IBk')}">
+        <div th:text="${'Classifier: ' + classifier}"></div>
+    </div>
+
+    <br/>
+    <a class="btn btn-primary" role="button" th:href="@{/rebuildClassifier}">Rebuild classifier...</a>
+</div>
+</body>
+</html>

@@ -48,6 +48,7 @@ public class FlickrService {
         PhotosInterface photosInterface = flickr.getPhotosInterface();
         SearchParameters params = new SearchParameters();
         String path = mainDirectory + "\\" + song.getArtist() + "-" + song.getTitle();
+        Files.deleteIfExists(Paths.get(path));
         Files.createDirectories(Paths.get(path));
         ArrayList<Stanza> stanzas = song.getStanzas();
         for (int i = 0; i < song.getStanzas().size(); i++) {

@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 public class NounsService {
     @Autowired
     ClassifierService classifierService;
-    
+
     private static final String WORD_REGEX = "[^A-Za-z]";
 
-    public Song extractNounsAndSetTags(Song song) throws IOException {
+    public Song extractNounsAndSetTags(Song song) throws Exception {
         for (Stanza stanza : song.getStanzas()) {
             POSSample stanzaSampled = generatePOSSample(stanza);
             int lineSampleLength = stanzaSampled.getSentence().length;
@@ -50,11 +50,9 @@ public class NounsService {
                     }
                 }
                 tags.add(longestWord.split(WORD_REGEX)[0]);
-                stanza.setTags(tags);
             } else if (nounList.size() <= 3) { // if there are 1-3 nouns, return them all
                 nounList.forEach(word -> word = word.split(WORD_REGEX)[0]);
                 tags.addAll(nounList);
-                stanza.setTags(tags);
             } else { // if there are 4+ nouns, return three longest nouns
                 String tag1 = Collections.max(nounList, Comparator.comparing(String::length));
                 nounList.remove(tag1);
@@ -65,12 +63,12 @@ public class NounsService {
                 tags.add(tag1.split(WORD_REGEX)[0]);
                 tags.add(tag2.split(WORD_REGEX)[0]);
                 tags.add(tag3.split(WORD_REGEX)[0]);
-                stanza.setTags(tags);
             }
+
+            String[] tagsArray = tags.stream().distinct().toArray(String[]::new);
+            tags.add(classifierService.evaluateInstance(tagsArray));
+            stanza.setTags(tags);
         }
-        // TODO add weather tag
-//        classifierService
-        // TODO end of add weather tag
         return song;
     }
 
