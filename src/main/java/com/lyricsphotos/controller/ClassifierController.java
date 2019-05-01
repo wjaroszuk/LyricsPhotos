@@ -15,7 +15,6 @@ public class ClassifierController {
 
     @GetMapping(value = "/classifierDetails")
     public String getClassifierDetails(Model model) {
-        System.out.println(classifierService.getClassifier());
         model.addAttribute("classifier", classifierService.getClassifier());
         return "/classifierDetails";
     }

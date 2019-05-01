@@ -7,5 +7,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SongsRepository extends CrudRepository<Song, Integer> {
     Song findSongById(int id);
-    Song findByArtistAndTitleAllIgnoreCase(String artist, String lyrics);
 }

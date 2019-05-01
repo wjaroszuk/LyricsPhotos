@@ -11,9 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 @Controller
 public class SongsController {
     @Autowired
@@ -35,10 +32,8 @@ public class SongsController {
     public String getSongDetails(@PathVariable(value = "id") int id, Model model) throws Exception {
         Song song = songsService.findSongById(id);
         if (!song.isAreTagsGenerated()) { // generate if tags are not generated
-            System.out.println(" getSongDetails >>> TAGS: " + song.isAreTagsGenerated() + "IMAGES: " + song.isAreImagesGenerated());
             song = nounsService.extractNounsAndSetTags(song);
             song.setAreTagsGenerated(true);
-            System.out.println(" getSongDetails >>> TAGS: " + song.isAreTagsGenerated() + "IMAGES: " + song.isAreImagesGenerated());
         }
         songsService.updateSong(song);
         model.addAttribute("song", songsService.findSongById(id));

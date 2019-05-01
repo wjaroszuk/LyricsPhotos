@@ -49,9 +49,7 @@ public class LyricsPhotosApplication {
 
     private void readAllTestData() throws IOException {
         List<File> files = Files.walk(Paths.get("D:\\lyrics\\testset")).filter(Files::isRegularFile).map(Path::toFile).collect(Collectors.toList());
-
         for (File file : files) {
-//            System.out.println("Reading file: " + file.getPath());
             List<String> lyricsLines;
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 lyricsLines = br.lines().collect(Collectors.toList());

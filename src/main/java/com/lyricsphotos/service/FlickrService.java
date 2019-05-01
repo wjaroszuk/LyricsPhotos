@@ -60,9 +60,7 @@ public class FlickrService {
             params.setSafeSearch("on"); // not sure if works
 
             try {
-                long start = System.currentTimeMillis();
                 PhotoList<Photo> searchResult = photosInterface.search(params, 1, 1);
-                System.out.println("Reading a photo over interface took {" + (System.currentTimeMillis() - start) + "} ms");
                 File file = new File(path + "/" + "image" + i + ".jpg");
                 ImageIO.write(photosInterface.getImage(searchResult.get(0), Size.MEDIUM_640), "jpg", file);
             } catch (FlickrException | IOException e) {
