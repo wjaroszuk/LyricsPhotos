@@ -11,11 +11,9 @@
     <div th:if="${#strings.containsIgnoreCase(classifier, 'J48')}">
         <div th:text="${'Classifier: ' + classifier.graph()}"></div>
     </div>
-
     <div th:if="${#strings.containsIgnoreCase(classifier, 'IBk')}">
         <div th:text="${'Classifier: ' + classifier}"></div>
     </div>
-
     <br/>
     <a class="btn btn-primary" role="button" th:href="@{/rebuildClassifier}">Rebuild classifier...</a>
 </div>
