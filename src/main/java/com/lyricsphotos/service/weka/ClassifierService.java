@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
+import weka.classifiers.Evaluation;
+import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.lazy.IBk;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.classifiers.trees.J48;
@@ -46,6 +48,9 @@ public class ClassifierService {
         j48.setUnpruned(true);
         this.classifier.setClassifier(j48);
         this.classifier.buildClassifier(trainingSet);
+        Evaluation eval = new Evaluation(this.trainingSet);
+        eval.crossValidateModel(this.classifier.getClassifier(), this.trainingSet, 10, new Random(1));
+        System.out.println(eval.toMatrixString());
     }
 
     public void recreateClassifier(String[] trainingFilenames, String classifierName) throws Exception {
@@ -61,6 +66,9 @@ public class ClassifierService {
         this.trainingSet.setClassIndex(this.trainingSet.attribute("weatherAttribute").index());
         setClassifier(classifierName);
         this.classifier.buildClassifier(trainingSet);
+        Evaluation eval = new Evaluation(this.trainingSet);
+        eval.crossValidateModel(this.classifier.getClassifier(), this.trainingSet, 10, new Random(1));
+        System.out.println(eval.toMatrixString());
     }
 
     private void setTrainingSet(ArrayList<String> trainingFilenames) throws IOException {
@@ -129,6 +137,10 @@ public class ClassifierService {
                 IBk iBkClassifier = new IBk();
                 iBkClassifier.setKNN(5);
                 classifier.setClassifier(iBkClassifier);
+                break;
+            case "Bayes":
+                NaiveBayes nb = new NaiveBayes();
+                classifier.setClassifier(nb);
                 break;
         }
     }
